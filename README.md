@@ -2,6 +2,12 @@
 
 A fast, lightweight currency converter web app built with Vite and Lit. Features simultaneous multi-currency conversion with smart caching and offline support.
 
+## 🌐 Live Demo
+
+**[View Live App](https://lkollar.github.io/currency-converter/)**
+
+The app is automatically deployed to GitHub Pages on every push to the main branch.
+
 ## 🚀 Features
 
 - **Multi-currency conversion**: Click any currency to enter an amount, see all others update instantly
@@ -182,3 +188,40 @@ Using Fawazahmed0/Currency API:
 - **Real-time updates**: All currencies update as you type
 - **Smart defaults**: Popular currencies pre-selected
 - **Mobile optimized**: Touch-friendly with proper keyboard types
+
+## 🚀 Deployment
+
+### GitHub Pages (Automatic)
+
+The app is automatically deployed to GitHub Pages using GitHub Actions:
+
+- **Live URL**: https://lkollar.github.io/currency-converter/
+- **Trigger**: Every push to the `main` branch
+- **Process**: Build → Test → Deploy
+- **Status**: Check the Actions tab for deployment status
+
+### Manual Deployment
+
+To deploy elsewhere:
+
+```bash
+# Build the app
+make build  # or npm run build
+
+# Deploy the contents of the `dist/` folder to your hosting provider
+# The app is a static site and can be hosted anywhere
+```
+
+### GitHub Pages Setup (One-time)
+
+1. Go to repository **Settings** → **Pages**
+2. Under "Source", select **"GitHub Actions"**
+3. The deployment workflow is already configured in `.github/workflows/deploy.yml`
+
+### Custom Domain (Optional)
+
+To use a custom domain:
+
+1. Add a `CNAME` file to the `public/` directory with your domain
+2. Configure DNS to point to `<username>.github.io`
+3. Enable "Enforce HTTPS" in repository settings

@@ -34,6 +34,11 @@ make dev        # Start development server (http://localhost:5173)
 make build      # Build for production
 make preview    # Preview production build
 
+# Testing
+make test       # Run tests in watch mode
+make test-run   # Run tests once
+make test-ui    # Run tests with interactive UI
+
 # Code Quality
 make format     # Format all files with Prettier
 make lint       # Check code formatting
@@ -46,10 +51,17 @@ make help       # Show all available commands
 ### Manual Commands (without Make)
 
 ```bash
+# Development
 npm run dev      # Development server
 npm run build    # Production build
 npm run preview  # Preview build
 
+# Testing
+npm run test     # Run tests in watch mode
+npm run test:run # Run tests once
+npm run test:ui  # Run tests with interactive UI
+
+# Code Quality
 npx prettier --write "**/*.{js,ts,html,css,json,md}"  # Format files
 ```
 
@@ -63,9 +75,9 @@ currency-converter/
 │   ├── store/             # State management
 │   ├── services/          # API and data services
 │   ├── components/        # Lit web components
+│   ├── tests/             # Unit tests
 │   ├── utils/             # Utility functions
 │   └── styles/            # CSS styles
-├── public/                # Static assets
 ├── Makefile              # Development commands
 └── vite.config.js        # Vite configuration
 ```
@@ -92,13 +104,61 @@ currency-converter/
 - User preferences persisted in localStorage
 - Smart cache invalidation and refresh
 
+## 🧪 Testing
+
+The project uses [Vitest](https://vitest.dev/) for unit testing with [@open-wc/testing](https://open-wc.org/testing/) for web component testing utilities.
+
+### Running Tests
+
+```bash
+# Run tests in watch mode (recommended during development)
+make test           # or npm run test
+
+# Run tests once (for CI)
+make test-run       # or npm run test:run
+
+# Run tests with interactive UI
+make test-ui        # or npm run test:ui
+```
+
+### Test Structure
+
+Tests are organized alongside source files in the `src/tests/` directory:
+
+```
+src/tests/
+├── components.test.js      # Component unit tests
+├── currency-api.test.js    # API service tests
+└── currency-store.test.js  # Store/state management tests
+```
+
+### Writing Tests
+
+- **Components**: Use `@open-wc/testing` for rendering and testing Lit components
+- **Services**: Standard Vitest unit tests for business logic
+- **Store**: Test state management and data flow
+
+### Test Examples
+
+```bash
+# Run specific test file
+npx vitest currency-store.test.js
+
+# Run tests with coverage
+npx vitest --coverage
+
+# Run tests in specific directory
+npx vitest src/tests/
+```
+
 ## 🧪 Development Workflow
 
 1. **Start development**: `make dev`
 2. **Make changes**: Edit files in `src/`
-3. **Format code**: `make format` (run before commits)
-4. **Build**: `make build` to test production build
-5. **Preview**: `make preview` to test built version
+3. **Run tests**: `make test` (keep running in background)
+4. **Format code**: `make format` (run before commits)
+5. **Build**: `make build` to test production build
+6. **Preview**: `make preview` to test built version
 
 ## 📦 Bundle Size
 
@@ -122,12 +182,3 @@ Using Fawazahmed0/Currency API:
 - **Real-time updates**: All currencies update as you type
 - **Smart defaults**: Popular currencies pre-selected
 - **Mobile optimized**: Touch-friendly with proper keyboard types
-
-## 🚧 Roadmap
-
-- [x] Basic project setup
-- [ ] Core conversion functionality
-- [ ] Settings panel
-- [ ] PWA features
-- [ ] Offline support
-- [ ] Performance optimization

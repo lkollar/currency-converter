@@ -1,0 +1,298 @@
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { currencyAPI } from "../services/currency-api.js";
+import { currencyStore } from "../store/currency-store.js";
+
+// Mock fetch
+global.fetch = vi.fn();
+
+// Mock currency store
+vi.mock("../store/currency-store.js", () => ({
+  currencyStore: {
+    rates: {},
+    setRates: vi.fn(),
+    setLoading: vi.fn(),
+    setError: vi.fn(),
+    areRatesStale: vi.fn(),
+  },
+}));
+
+describe("CurrencyAPI", () => {
+  beforeEach(() => {
+    // Reset mocks
+    fetch.mockClear();
+    currencyStore.setRates.mockClear();
+    currencyStore.setLoading.mockClear();
+    currencyStore.setError.mockClear();
+    currencyStore.areRatesStale.mockClear();
+
+    // Reset store state
+    currencyStore.rates = {};
+  });
+
+  describe("fetchRates", () => {
+    it("should fetch and process exchange rates successfully", async () => {
+      const mockApiResponse = {
+        date: "2024-01-01",
+        usd: {
+          eur: 0.92,
+          gbp: 0.79,
+          jpy: 149.85,
+        },
+      };
+
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockApiResponse),
+      });
+
+      const result = await currencyAPI.fetchRates();
+
+      expect(fetch).toHaveBeenCalledWith(
+        "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json",
+      );
+      expect(currencyStore.setLoading).toHaveBeenCalledWith(true);
+      expect(currencyStore.setLoading).toHaveBeenCalledWith(false);
+      expect(currencyStore.setError).toHaveBeenCalledWith(null);
+      expect(currencyStore.setRates).toHaveBeenCalledWith({
+        usd: 1,
+        eur: 0.92,
+        gbp: 0.79,
+        jpy: 149.85,
+      });
+      expect(result).toEqual({
+        usd: 1,
+        eur: 0.92,
+        gbp: 0.79,
+        jpy: 149.85,
+      });
+    });
+
+    it("should handle HTTP errors", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+      });
+
+      await expect(currencyAPI.fetchRates()).rejects.toThrow(
+        "HTTP error! status: 404",
+      );
+
+      expect(currencyStore.setLoading).toHaveBeenCalledWith(true);
+      expect(currencyStore.setLoading).toHaveBeenCalledWith(false);
+      expect(currencyStore.setError).toHaveBeenCalledWith(
+        "HTTP error! status: 404",
+      );
+    });
+
+    it("should handle network errors", async () => {
+      fetch.mockRejectedValueOnce(new Error("Network error"));
+
+      await expect(currencyAPI.fetchRates()).rejects.toThrow("Network error");
+
+      expect(currencyStore.setLoading).toHaveBeenCalledWith(true);
+      expect(currencyStore.setLoading).toHaveBeenCalledWith(false);
+      expect(currencyStore.setError).toHaveBeenCalledWith("Network error");
+    });
+
+    it("should handle invalid API response format", async () => {
+      const mockApiResponse = {
+        date: "2024-01-01",
+        // Missing usd key
+      };
+
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockApiResponse),
+      });
+
+      await expect(currencyAPI.fetchRates()).rejects.toThrow(
+        "Invalid API response format",
+      );
+    });
+  });
+
+  describe("getRates", () => {
+    it("should return cached rates if they are fresh", async () => {
+      currencyStore.rates = { usd: 1, eur: 0.92 };
+      currencyStore.areRatesStale.mockReturnValue(false);
+
+      const result = await currencyAPI.getRates();
+
+      expect(result).toEqual({ usd: 1, eur: 0.92 });
+      expect(fetch).not.toHaveBeenCalled();
+    });
+
+    it("should fetch fresh rates if cache is stale", async () => {
+      currencyStore.rates = {};
+      currencyStore.areRatesStale.mockReturnValue(true);
+
+      const mockApiResponse = {
+        date: "2024-01-01",
+        usd: { eur: 0.92 },
+      };
+
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockApiResponse),
+      });
+
+      const result = await currencyAPI.getRates();
+
+      expect(fetch).toHaveBeenCalled();
+      expect(result).toEqual({ usd: 1, eur: 0.92 });
+    });
+
+    it("should fetch fresh rates if no cached rates exist", async () => {
+      currencyStore.rates = {};
+      currencyStore.areRatesStale.mockReturnValue(false); // Fresh but empty
+
+      const mockApiResponse = {
+        date: "2024-01-01",
+        usd: { eur: 0.92 },
+      };
+
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockApiResponse),
+      });
+
+      await currencyAPI.getRates();
+
+      expect(fetch).toHaveBeenCalled();
+    });
+  });
+
+  describe("initialize", () => {
+    it("should use cached rates if they are fresh", async () => {
+      currencyStore.rates = { usd: 1, eur: 0.92 };
+      currencyStore.areRatesStale.mockReturnValue(false);
+
+      const result = await currencyAPI.initialize();
+
+      expect(result).toEqual({ usd: 1, eur: 0.92 });
+      expect(fetch).not.toHaveBeenCalled();
+    });
+
+    it("should fetch fresh rates if cache is stale", async () => {
+      currencyStore.rates = { usd: 1, eur: 0.85 };
+      currencyStore.areRatesStale.mockReturnValue(true);
+
+      const mockApiResponse = {
+        date: "2024-01-01",
+        usd: { eur: 0.92 },
+      };
+
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockApiResponse),
+      });
+
+      const result = await currencyAPI.initialize();
+
+      expect(fetch).toHaveBeenCalled();
+      expect(result).toEqual({ usd: 1, eur: 0.92 });
+    });
+
+    it("should fallback to cached rates if fetch fails", async () => {
+      currencyStore.rates = { usd: 1, eur: 0.85 };
+      currencyStore.areRatesStale.mockReturnValue(true);
+
+      fetch.mockRejectedValueOnce(new Error("Network error"));
+
+      const result = await currencyAPI.initialize();
+
+      expect(result).toEqual({ usd: 1, eur: 0.85 });
+    });
+
+    it("should throw error if fetch fails and no cached rates exist", async () => {
+      currencyStore.rates = {};
+      currencyStore.areRatesStale.mockReturnValue(true);
+
+      fetch.mockRejectedValueOnce(new Error("Network error"));
+
+      await expect(currencyAPI.initialize()).rejects.toThrow("Network error");
+    });
+  });
+
+  describe("getAvailableCurrencies", () => {
+    it("should return sorted list of available currencies", () => {
+      currencyStore.rates = {
+        usd: 1,
+        eur: 0.92,
+        gbp: 0.79,
+        jpy: 149.85,
+      };
+
+      const result = currencyAPI.getAvailableCurrencies();
+
+      expect(result).toEqual(["EUR", "GBP", "JPY", "USD"]);
+    });
+
+    it("should return empty array if no rates available", () => {
+      currencyStore.rates = {};
+
+      const result = currencyAPI.getAvailableCurrencies();
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe("isCurrencySupported", () => {
+    beforeEach(() => {
+      currencyStore.rates = {
+        usd: 1,
+        eur: 0.92,
+        gbp: 0.79,
+      };
+    });
+
+    it("should return true for supported currency", () => {
+      expect(currencyAPI.isCurrencySupported("USD")).toBe(true);
+      expect(currencyAPI.isCurrencySupported("usd")).toBe(true);
+      expect(currencyAPI.isCurrencySupported("EUR")).toBe(true);
+    });
+
+    it("should return false for unsupported currency", () => {
+      expect(currencyAPI.isCurrencySupported("UNKNOWN")).toBe(false);
+      expect(currencyAPI.isCurrencySupported("XYZ")).toBe(false);
+    });
+  });
+
+  describe("getCurrencyName", () => {
+    it("should return currency name for known currencies", () => {
+      expect(currencyAPI.getCurrencyName("USD")).toBe("US Dollar");
+      expect(currencyAPI.getCurrencyName("EUR")).toBe("Euro");
+      expect(currencyAPI.getCurrencyName("GBP")).toBe("British Pound");
+      expect(currencyAPI.getCurrencyName("JPY")).toBe("Japanese Yen");
+    });
+
+    it("should return currency code for unknown currencies", () => {
+      expect(currencyAPI.getCurrencyName("UNKNOWN")).toBe("UNKNOWN");
+      expect(currencyAPI.getCurrencyName("XYZ")).toBe("XYZ");
+    });
+
+    it("should handle lowercase input", () => {
+      expect(currencyAPI.getCurrencyName("usd")).toBe("US Dollar");
+      expect(currencyAPI.getCurrencyName("eur")).toBe("Euro");
+    });
+  });
+
+  describe("getCurrencyFlag", () => {
+    it("should return flag emoji for known currencies", () => {
+      expect(currencyAPI.getCurrencyFlag("USD")).toBe("🇺🇸");
+      expect(currencyAPI.getCurrencyFlag("EUR")).toBe("🇪🇺");
+      expect(currencyAPI.getCurrencyFlag("GBP")).toBe("🇬🇧");
+      expect(currencyAPI.getCurrencyFlag("JPY")).toBe("🇯🇵");
+    });
+
+    it("should return default flag for unknown currencies", () => {
+      expect(currencyAPI.getCurrencyFlag("UNKNOWN")).toBe("🏳️");
+      expect(currencyAPI.getCurrencyFlag("XYZ")).toBe("🏳️");
+    });
+
+    it("should handle lowercase input", () => {
+      expect(currencyAPI.getCurrencyFlag("usd")).toBe("🇺🇸");
+      expect(currencyAPI.getCurrencyFlag("eur")).toBe("🇪🇺");
+    });
+  });
+});

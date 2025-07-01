@@ -147,9 +147,30 @@ export class CurrencyGrid extends LitElement {
   _handleAddCurrency() {
     // Add the first available major currency that's not already selected
     const majorCurrencies = [
-      'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'KRW', 'SGD', 'HKD',
-      'NOK', 'SEK', 'DKK', 'PLN', 'CZK', 'HUF', 'BRL', 'MXN',
-      'ZAR', 'NZD', 'TRY', 'AED', 'THB', 'MYR', 'IDR', 'PHP'
+      "CAD",
+      "AUD",
+      "CHF",
+      "CNY",
+      "INR",
+      "KRW",
+      "SGD",
+      "HKD",
+      "NOK",
+      "SEK",
+      "DKK",
+      "PLN",
+      "CZK",
+      "HUF",
+      "BRL",
+      "MXN",
+      "ZAR",
+      "NZD",
+      "TRY",
+      "AED",
+      "THB",
+      "MYR",
+      "IDR",
+      "PHP",
     ];
 
     for (const currency of majorCurrencies) {
@@ -203,7 +224,7 @@ export class CurrencyGrid extends LitElement {
       <div class="grid">
         ${this._userCurrencies.map(
           (currency) => html`
-            <currency-card 
+            <currency-card
               currency=${currency}
               @currency-changed=${this._handleCurrencyChanged}
             ></currency-card>

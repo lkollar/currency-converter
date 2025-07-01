@@ -268,7 +268,7 @@ export class CurrencyCard extends LitElement {
     this._isUpdated = false;
     this._debounceTimer = null;
     this._showSelector = false;
-    this._selectorFilter = '';
+    this._selectorFilter = "";
     this._highlightedIndex = -1;
     this._filteredCurrencies = [];
     this._canRemove = true;
@@ -282,7 +282,7 @@ export class CurrencyCard extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this._updateFromStore(currencyStore);
-    
+
     // Add global event listeners for dismissing selector
     this._handleGlobalClick = this._handleGlobalClick.bind(this);
     this._handleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
@@ -296,7 +296,7 @@ export class CurrencyCard extends LitElement {
     if (this._debounceTimer) {
       clearTimeout(this._debounceTimer);
     }
-    
+
     // Remove global event listeners
     this._removeGlobalListeners();
   }
@@ -336,10 +336,10 @@ export class CurrencyCard extends LitElement {
 
   _handleCardClick(e) {
     // Don't activate if clicking on currency header (for selector)
-    if (e.target.closest('.currency-header')) {
+    if (e.target.closest(".currency-header")) {
       return;
     }
-    
+
     if (!this._isActive) {
       currencyStore.setActiveCurrency(this.currency, this._amount);
       // Focus the input field after it's rendered
@@ -357,16 +357,16 @@ export class CurrencyCard extends LitElement {
     e.stopPropagation();
     const wasOpen = this._showSelector;
     this._showSelector = !this._showSelector;
-    this._selectorFilter = '';
+    this._selectorFilter = "";
     this._highlightedIndex = -1;
     this._updateFilteredCurrencies();
-    
+
     if (this._showSelector) {
       // Add global listeners when opening
       this._addGlobalListeners();
-      
+
       this.updateComplete.then(() => {
-        const input = this.shadowRoot.querySelector('.currency-selector input');
+        const input = this.shadowRoot.querySelector(".currency-selector input");
         if (input) {
           input.focus();
         }
@@ -380,20 +380,55 @@ export class CurrencyCard extends LitElement {
   _updateFilteredCurrencies() {
     // Focus on major currencies with proper flags
     const majorCurrencies = [
-      'USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'KRW',
-      'SGD', 'HKD', 'NOK', 'SEK', 'DKK', 'PLN', 'CZK', 'HUF', 'RUB', 'BRL',
-      'MXN', 'ZAR', 'NZD', 'TRY', 'AED', 'THB', 'MYR', 'IDR', 'PHP', 'VND',
-      'ILS', 'EGP', 'SAR', 'QAR', 'KWD', 'BHD', 'OMR', 'JOD', 'LBP'
+      "USD",
+      "EUR",
+      "GBP",
+      "JPY",
+      "CAD",
+      "AUD",
+      "CHF",
+      "CNY",
+      "INR",
+      "KRW",
+      "SGD",
+      "HKD",
+      "NOK",
+      "SEK",
+      "DKK",
+      "PLN",
+      "CZK",
+      "HUF",
+      "RUB",
+      "BRL",
+      "MXN",
+      "ZAR",
+      "NZD",
+      "TRY",
+      "AED",
+      "THB",
+      "MYR",
+      "IDR",
+      "PHP",
+      "VND",
+      "ILS",
+      "EGP",
+      "SAR",
+      "QAR",
+      "KWD",
+      "BHD",
+      "OMR",
+      "JOD",
+      "LBP",
     ];
-    
+
     const filter = this._selectorFilter.toLowerCase();
     const currentUserCurrencies = currencyStore.userCurrencies;
-    
+
     this._filteredCurrencies = majorCurrencies
-      .filter(code => {
+      .filter((code) => {
         // Exclude currencies that are already selected
         if (currentUserCurrencies.includes(code)) return false;
-        
+
         const name = currencyAPI.getCurrencyName(code).toLowerCase();
         return code.toLowerCase().includes(filter) || name.includes(filter);
       })
@@ -407,21 +442,21 @@ export class CurrencyCard extends LitElement {
   }
 
   _handleSelectorKeyDown(e) {
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       this._closeSelector();
       return;
     }
-    
-    if (e.key === 'ArrowDown') {
+
+    if (e.key === "ArrowDown") {
       e.preventDefault();
       this._highlightedIndex = Math.min(
         this._highlightedIndex + 1,
-        this._filteredCurrencies.length - 1
+        this._filteredCurrencies.length - 1,
       );
-    } else if (e.key === 'ArrowUp') {
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
       this._highlightedIndex = Math.max(this._highlightedIndex - 1, -1);
-    } else if (e.key === 'Enter') {
+    } else if (e.key === "Enter") {
       e.preventDefault();
       if (this._highlightedIndex >= 0) {
         this._selectCurrency(this._filteredCurrencies[this._highlightedIndex]);
@@ -432,7 +467,7 @@ export class CurrencyCard extends LitElement {
   _selectCurrency(newCurrency) {
     if (newCurrency !== this.currency) {
       const oldCurrency = this.currency;
-      
+
       // Check if the new currency is already in the user's currency list
       if (currencyStore.userCurrencies.includes(newCurrency)) {
         // If new currency already exists, just remove the old one
@@ -449,12 +484,14 @@ export class CurrencyCard extends LitElement {
           currencyStore.addCurrency(newCurrency);
         }
       }
-      
+
       this.currency = newCurrency;
-      this.dispatchEvent(new CustomEvent('currency-changed', {
-        detail: { oldCurrency, newCurrency },
-        bubbles: true
-      }));
+      this.dispatchEvent(
+        new CustomEvent("currency-changed", {
+          detail: { oldCurrency, newCurrency },
+          bubbles: true,
+        }),
+      );
     }
     this._closeSelector();
   }
@@ -478,14 +515,14 @@ export class CurrencyCard extends LitElement {
   _addGlobalListeners() {
     // Use setTimeout to avoid immediate triggering
     setTimeout(() => {
-      document.addEventListener('click', this._handleGlobalClick);
-      document.addEventListener('keydown', this._handleGlobalKeyDown);
+      document.addEventListener("click", this._handleGlobalClick);
+      document.addEventListener("keydown", this._handleGlobalKeyDown);
     }, 0);
   }
 
   _removeGlobalListeners() {
-    document.removeEventListener('click', this._handleGlobalClick);
-    document.removeEventListener('keydown', this._handleGlobalKeyDown);
+    document.removeEventListener("click", this._handleGlobalClick);
+    document.removeEventListener("keydown", this._handleGlobalKeyDown);
   }
 
   _handleGlobalClick(e) {
@@ -496,7 +533,7 @@ export class CurrencyCard extends LitElement {
   }
 
   _handleGlobalKeyDown(e) {
-    if (e.key === 'Escape' && this._showSelector) {
+    if (e.key === "Escape" && this._showSelector) {
       this._closeSelector();
     }
   }
@@ -594,8 +631,8 @@ export class CurrencyCard extends LitElement {
           <span class="currency-flag">${this._getCurrencyFlag()}</span>
           <span class="currency-name">${this._getCurrencyName()}</span>
           <span class="currency-code">${this.currency}</span>
-          <button 
-            class="remove-button" 
+          <button
+            class="remove-button"
             ?disabled=${!this._canRemove}
             @click=${this._handleRemoveClick}
             title="Remove currency"
@@ -624,30 +661,42 @@ export class CurrencyCard extends LitElement {
             : html` ${this._formatAmount(this._amount)} `}
         </div>
 
-        ${this._showSelector ? html`
-          <div class="currency-selector" @click=${(e) => e.stopPropagation()}>
-            <input
-              type="text"
-              placeholder="Search currencies..."
-              .value=${this._selectorFilter}
-              @input=${this._handleSelectorInput}
-              @keydown=${this._handleSelectorKeyDown}
-            />
-            ${this._filteredCurrencies.map((code, index) => html`
+        ${this._showSelector
+          ? html`
               <div
-                class="currency-option ${index === this._highlightedIndex ? 'highlighted' : ''}"
-                @click=${() => this._handleOptionClick(code)}
+                class="currency-selector"
+                @click=${(e) => e.stopPropagation()}
               >
-                <span class="currency-option-flag">${currencyAPI.getCurrencyFlag(code)}</span>
-                <div class="currency-option-details">
-                  <div class="currency-option-name">${currencyAPI.getCurrencyName(code)}</div>
-                  <div class="currency-option-code">${code}</div>
-                </div>
+                <input
+                  type="text"
+                  placeholder="Search currencies..."
+                  .value=${this._selectorFilter}
+                  @input=${this._handleSelectorInput}
+                  @keydown=${this._handleSelectorKeyDown}
+                />
+                ${this._filteredCurrencies.map(
+                  (code, index) => html`
+                    <div
+                      class="currency-option ${index === this._highlightedIndex
+                        ? "highlighted"
+                        : ""}"
+                      @click=${() => this._handleOptionClick(code)}
+                    >
+                      <span class="currency-option-flag"
+                        >${currencyAPI.getCurrencyFlag(code)}</span
+                      >
+                      <div class="currency-option-details">
+                        <div class="currency-option-name">
+                          ${currencyAPI.getCurrencyName(code)}
+                        </div>
+                        <div class="currency-option-code">${code}</div>
+                      </div>
+                    </div>
+                  `,
+                )}
               </div>
-            `)}
-          </div>
-        ` : ''}
-
+            `
+          : ""}
         ${!this._isActive
           ? html` <div class="hint">Click to start editing</div> `
           : ""}

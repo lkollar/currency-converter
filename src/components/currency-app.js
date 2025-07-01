@@ -37,21 +37,6 @@ export class CurrencyApp extends LitElement {
       margin: 0.25rem 0 0 0;
     }
 
-    .settings-btn {
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.75rem 1rem;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .settings-btn:hover {
-      background-color: #1d4ed8;
-    }
-
     .loading {
       display: flex;
       justify-content: center;
@@ -175,11 +160,6 @@ export class CurrencyApp extends LitElement {
     }
   }
 
-  _handleSettings() {
-    // TODO: Implement settings panel
-    console.log("Settings clicked");
-  }
-
   _formatLastUpdated() {
     if (!this._lastUpdated) return "Never";
 
@@ -199,9 +179,6 @@ export class CurrencyApp extends LitElement {
           <h1 class="title">💱 Currency Converter</h1>
           <p class="subtitle">Click any currency to start editing</p>
         </div>
-        <button class="settings-btn" @click=${this._handleSettings}>
-          ⚙️ Settings
-        </button>
       </div>
 
       ${this._error

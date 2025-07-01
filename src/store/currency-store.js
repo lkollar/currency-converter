@@ -89,10 +89,33 @@ class CurrencyStore {
     this.notify();
   }
 
+  // Reorder currencies in user's list
+  reorderCurrencies(fromIndex, toIndex) {
+    if (
+      fromIndex === toIndex ||
+      fromIndex < 0 ||
+      toIndex < 0 ||
+      fromIndex >= this.userCurrencies.length ||
+      toIndex >= this.userCurrencies.length
+    ) {
+      return;
+    }
+
+    const newOrder = [...this.userCurrencies];
+    const [movedItem] = newOrder.splice(fromIndex, 1);
+    newOrder.splice(toIndex, 0, movedItem);
+
+    this.userCurrencies = newOrder;
+    this.saveToStorage();
+    this.notify();
+  }
+
   // Calculate amount in target currency
   convertAmount(fromCurrency, toCurrency, amount) {
     if (!this.rates || Object.keys(this.rates).length === 0) {
-      return 0;
+      // If rates aren't loaded yet, return the same amount as fallback
+      // This prevents showing 0 for new currencies before rates load
+      return amount;
     }
 
     const from = fromCurrency.toLowerCase();

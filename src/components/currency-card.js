@@ -288,6 +288,14 @@ export class CurrencyCard extends LitElement {
     this._handleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
   }
 
+  willUpdate(changedProperties) {
+    super.willUpdate(changedProperties);
+    // Update from store when currency property changes
+    if (changedProperties.has("currency")) {
+      this._updateFromStore(currencyStore);
+    }
+  }
+
   disconnectedCallback() {
     super.disconnectedCallback();
     if (this._unsubscribe) {
@@ -628,8 +636,9 @@ export class CurrencyCard extends LitElement {
     return html`
       <div class="${cardClasses}" @click=${this._handleCardClick}>
         <div class="currency-header" @click=${this._handleCurrencyHeaderClick}>
-          <span class="currency-flag">${this._getCurrencyFlag()}</span>
-          <span class="currency-name">${this._getCurrencyName()}</span>
+          <span class="currency-name"
+            >${this._getCurrencyFlag()} ${this._getCurrencyName()}</span
+          >
           <span class="currency-code">${this.currency}</span>
           <button
             class="remove-button"
@@ -651,7 +660,7 @@ export class CurrencyCard extends LitElement {
                 <input
                   class="amount-input"
                   type="text"
-                  .value=${this._amount.toString()}
+                  .value=${this._amount.toFixed(2)}
                   @input=${this._handleInputChange}
                   @keydown=${this._handleInputKeyDown}
                   @click=${(e) => e.stopPropagation()}

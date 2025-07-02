@@ -158,6 +158,32 @@ export class CurrencyCard extends LitElement {
       color: #2563eb;
     }
 
+    .amount-input.unsaved {
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    .submit-button {
+      margin-left: 0.5rem;
+      padding: 0.25rem 0.5rem;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .submit-button:hover {
+      background: #1d4ed8;
+    }
+
+    .submit-button:disabled {
+      background: #d1d5db;
+      cursor: not-allowed;
+    }
+
     .currency-selector {
       position: absolute;
       top: 100%;
@@ -251,6 +277,8 @@ export class CurrencyCard extends LitElement {
     currency: { type: String },
     _isActive: { state: true },
     _amount: { state: true },
+    _inputValue: { state: true },
+    _hasUnsavedChanges: { state: true },
     _isCalculating: { state: true },
     _isUpdated: { state: true },
     _showSelector: { state: true },
@@ -264,9 +292,10 @@ export class CurrencyCard extends LitElement {
     this.currency = "USD";
     this._isActive = false;
     this._amount = 0;
+    this._inputValue = "";
+    this._hasUnsavedChanges = false;
     this._isCalculating = false;
     this._isUpdated = false;
-    this._debounceTimer = null;
     this._showSelector = false;
     this._selectorFilter = "";
     this._highlightedIndex = -1;
@@ -301,9 +330,6 @@ export class CurrencyCard extends LitElement {
     if (this._unsubscribe) {
       this._unsubscribe();
     }
-    if (this._debounceTimer) {
-      clearTimeout(this._debounceTimer);
-    }
 
     // Remove global event listeners
     this._removeGlobalListeners();
@@ -316,9 +342,16 @@ export class CurrencyCard extends LitElement {
     // Update amount
     if (this._isActive) {
       this._amount = store.activeAmount;
+      // Update input value when becoming active or amount changes from external source
+      if (!wasActive || !this._hasUnsavedChanges) {
+        this._inputValue = this._amount.toFixed(2);
+        this._hasUnsavedChanges = false;
+      }
     } else {
       const amounts = store.getAllAmounts();
       this._amount = amounts[this.currency] || 0;
+      // Clear any unsaved changes when becoming inactive
+      this._hasUnsavedChanges = false;
     }
 
     // Check if this currency can be removed (not the last one)
@@ -548,20 +581,39 @@ export class CurrencyCard extends LitElement {
 
   _handleInputChange(e) {
     const value = e.target.value;
+    this._inputValue = value;
+
+    // Check if value has changed from stored amount
     const numericValue = parseFloat(value) || 0;
+    this._hasUnsavedChanges = numericValue !== this._amount;
+  }
 
-    // Clear any existing debounce timer
-    if (this._debounceTimer) {
-      clearTimeout(this._debounceTimer);
-    }
-
-    // Update store after debounce delay
-    this._debounceTimer = setTimeout(() => {
+  _submitValue() {
+    if (this._hasUnsavedChanges) {
+      const numericValue = parseFloat(this._inputValue) || 0;
       currencyStore.setActiveAmount(numericValue);
-    }, 300);
+      this._hasUnsavedChanges = false;
+    }
+  }
+
+  _handleInputBlur() {
+    this._submitValue();
+  }
+
+  _handleSubmitClick(e) {
+    e.stopPropagation();
+    this._submitValue();
   }
 
   _handleInputKeyDown(e) {
+    // Submit on Enter key
+    if (e.key === "Enter") {
+      e.preventDefault();
+      this._submitValue();
+      e.target.blur(); // Remove focus after submit
+      return;
+    }
+
     // Allow: backspace, delete, tab, escape, enter
     if (
       [8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
@@ -658,14 +710,28 @@ export class CurrencyCard extends LitElement {
           ${this._isActive
             ? html`
                 <input
-                  class="amount-input"
+                  class="amount-input ${this._hasUnsavedChanges
+                    ? "unsaved"
+                    : ""}"
                   type="text"
-                  .value=${this._amount.toFixed(2)}
+                  .value=${this._inputValue}
                   @input=${this._handleInputChange}
                   @keydown=${this._handleInputKeyDown}
+                  @blur=${this._handleInputBlur}
                   @click=${(e) => e.stopPropagation()}
                   placeholder="0.00"
                 />
+                ${this._hasUnsavedChanges
+                  ? html`
+                      <button
+                        class="submit-button"
+                        @click=${this._handleSubmitClick}
+                        title="Submit value (or press Enter)"
+                      >
+                        ✓
+                      </button>
+                    `
+                  : ""}
               `
             : html` ${this._formatAmount(this._amount)} `}
         </div>

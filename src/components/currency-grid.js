@@ -11,14 +11,14 @@ export class CurrencyGrid extends LitElement {
     .grid {
       display: grid;
       gap: 1.5rem;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      animation: fadeIn 0.6s ease-out;
     }
 
     .currency-card-wrapper {
-      transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: grab;
+      will-change: transform;
     }
 
     .currency-card-wrapper:active {
@@ -26,48 +26,64 @@ export class CurrencyGrid extends LitElement {
     }
 
     .currency-card-wrapper.dragging {
-      transform: rotate(2deg) scale(1.02);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      transform: rotate(3deg) scale(1.05);
+      box-shadow: var(--shadow-2xl);
       z-index: 1000;
+      backdrop-filter: var(--backdrop-blur);
     }
 
     .currency-card-wrapper.drop-target {
-      transform: scale(1.05);
-      box-shadow:
-        0 0 0 2px #2563eb,
-        0 8px 25px rgba(37, 99, 235, 0.2);
+      transform: scale(1.02);
+      box-shadow: var(--shadow-xl), var(--shadow-glow-primary);
     }
 
     .add-currency {
-      background: #f8fafc;
-      border: 2px dashed #d1d5db;
-      border-radius: 0.75rem;
-      padding: 1.5rem;
+      background: rgba(240, 253, 244, 0.7);
+      backdrop-filter: var(--backdrop-blur-sm);
+      border: 2px dashed rgba(5, 150, 105, 0.3);
+      border-radius: 1rem;
+      padding: 2rem;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       min-height: 120px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
+      box-shadow: var(--shadow-xs);
+      transform: scale(1);
     }
 
     .add-currency:hover {
-      border-color: #2563eb;
-      background-color: #f0f9ff;
+      border-color: var(--color-primary);
+      background: rgba(220, 252, 231, 0.8);
+      box-shadow: var(--shadow-md);
+      transform: scale(1.02);
     }
 
     .add-currency-icon {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      opacity: 0.5;
+      font-size: var(--font-size-4xl);
+      margin-bottom: 0.75rem;
+      opacity: 0.6;
+      background: var(--color-primary-gradient);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: all 0.3s ease;
+    }
+
+    .add-currency:hover .add-currency-icon {
+      opacity: 1;
+      transform: scale(1.1);
     }
 
     .add-currency-text {
-      font-size: 1rem;
-      color: #6b7280;
-      font-weight: 500;
+      font-family: var(--font-family-display);
+      font-size: var(--font-size-lg);
+      color: var(--color-gray-700);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-snug);
     }
 
     .add-currency-picker {
@@ -138,7 +154,48 @@ export class CurrencyGrid extends LitElement {
     .empty-state {
       text-align: center;
       padding: 3rem 1rem;
-      color: #6b7280;
+      color: var(--color-gray-600);
+      font-family: var(--font-family-sans);
+    }
+
+    /* Enhanced Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .grid {
+        gap: 1.25rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .grid {
+        gap: 1rem;
+        grid-template-columns: 1fr;
+      }
+
+      .add-currency {
+        padding: 1.5rem;
+        min-height: 100px;
+      }
+
+      .add-currency-icon {
+        font-size: var(--font-size-3xl);
+        margin-bottom: 0.5rem;
+      }
+
+      .add-currency-text {
+        font-size: var(--font-size-base);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid {
+        gap: 0.75rem;
+      }
+
+      .add-currency {
+        padding: 1.25rem;
+        min-height: 90px;
+      }
     }
 
     .empty-state h3 {

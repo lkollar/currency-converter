@@ -7,83 +7,126 @@ export class CurrencyApp extends LitElement {
   static styles = css`
     :host {
       display: block;
-      font-family:
-        -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: var(--font-family-sans);
       max-width: 1200px;
       margin: 0 auto;
-      padding: 1rem;
-      background-color: #f8fafc;
+      padding: 2rem 1rem;
       min-height: 100vh;
     }
 
     .header {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      margin-bottom: 2rem;
-      padding: 1rem 0;
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2rem 0;
+      position: relative;
+    }
+
+    .header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: var(--color-primary-gradient);
+      border-radius: 2px;
+      margin-bottom: 1rem;
     }
 
     .title {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #1f2937;
-      margin: 0;
+      font-family: var(--font-family-display);
+      font-size: var(--font-size-4xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-gray-900);
+      margin: 1rem 0 0.5rem 0;
+      line-height: var(--line-height-tight);
+      background: var(--color-primary-gradient);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .subtitle {
-      font-size: 0.875rem;
-      color: #6b7280;
-      margin: 0.25rem 0 0 0;
+      font-family: var(--font-family-sans);
+      font-size: var(--font-size-lg);
+      color: var(--color-gray-600);
+      margin: 0;
+      font-weight: var(--font-weight-normal);
+      line-height: var(--line-height-relaxed);
     }
 
     .loading {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 2rem;
-      color: #6b7280;
+      padding: 3rem;
+      color: var(--color-gray-600);
+      font-size: var(--font-size-lg);
     }
 
     .error {
-      background-color: #fef2f2;
-      border: 1px solid #fecaca;
-      color: #dc2626;
-      padding: 1rem;
-      border-radius: 0.5rem;
-      margin-bottom: 1rem;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: var(--color-error);
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1.5rem;
+      font-family: var(--font-family-sans);
+      font-size: var(--font-size-sm);
+      backdrop-filter: var(--backdrop-blur-sm);
     }
 
     .footer {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      margin-top: 2rem;
-      padding: 1rem 0;
-      font-size: 0.875rem;
-      color: #6b7280;
+      gap: 1.5rem;
+      margin-top: 3rem;
+      padding: 2rem 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-gray-600);
+      background: var(--color-surface);
+      border-radius: 1rem;
+      backdrop-filter: var(--backdrop-blur-sm);
+      box-shadow: var(--shadow-sm);
     }
 
     .last-updated {
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      font-family: var(--font-family-sans);
     }
 
     .refresh-btn {
-      background: none;
-      border: 1px solid #d1d5db;
-      color: #6b7280;
-      border-radius: 0.375rem;
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
+      background: var(--color-surface-elevated);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      color: var(--color-primary);
+      border-radius: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      font-family: var(--font-family-sans);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-xs);
+      transform: scale(1);
     }
 
     .refresh-btn:hover {
-      background-color: #f3f4f6;
-      border-color: #9ca3af;
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-md);
+      transform: scale(1.02);
+    }
+
+    .refresh-btn:active {
+      transform: scale(0.98);
     }
 
     .refresh-btn:disabled {
@@ -91,25 +134,72 @@ export class CurrencyApp extends LitElement {
       cursor: not-allowed;
     }
 
-    @media (max-width: 640px) {
+    /* Enhanced Mobile Responsiveness */
+    @media (max-width: 768px) {
       :host {
-        padding: 0.5rem;
+        padding: 1rem;
       }
 
       .header {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
+        margin-bottom: 2rem;
+        padding: 1rem 0;
       }
 
       .title {
-        font-size: 1.5rem;
+        font-size: var(--font-size-3xl);
+      }
+
+      .subtitle {
+        font-size: var(--font-size-base);
       }
 
       .footer {
         flex-direction: column;
         gap: 1rem;
-        text-align: center;
+        margin-top: 2rem;
+        padding: 1.5rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      :host {
+        padding: 0.75rem;
+      }
+
+      .header {
+        margin-bottom: 1.5rem;
+      }
+
+      .title {
+        font-size: var(--font-size-2xl);
+      }
+
+      .subtitle {
+        font-size: var(--font-size-sm);
+      }
+    }
+
+    @media (max-width: 480px) {
+      :host {
+        padding: 0.5rem;
+      }
+
+      .header::before {
+        width: 60px;
+        height: 3px;
+      }
+
+      .title {
+        font-size: var(--font-size-xl);
+        margin: 0.75rem 0 0.25rem 0;
+      }
+
+      .subtitle {
+        font-size: var(--font-size-sm);
+      }
+
+      .footer {
+        padding: 1rem;
       }
     }
   `;

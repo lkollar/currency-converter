@@ -9,37 +9,48 @@ export class CurrencyCard extends LitElement {
     }
 
     .card {
-      background: white;
-      border: 2px solid #e5e7eb;
-      border-radius: 0.75rem;
+      background: var(--color-surface);
+      backdrop-filter: var(--backdrop-blur-sm);
+      border: 1px solid rgba(229, 231, 235, 0.3);
+      border-radius: 1rem;
       padding: 1.5rem;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       min-height: 120px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      transform: translateY(0);
     }
 
     .card:hover {
-      border-color: #d1d5db;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      background: var(--color-surface-elevated);
+      border-color: rgba(99, 102, 241, 0.2);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
     }
 
     .card.active {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      background: var(--color-surface-active);
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
+      transform: translateY(-1px);
     }
 
     .card.calculating {
-      border-color: #f59e0b;
-      opacity: 0.8;
+      background: rgba(245, 158, 11, 0.05);
+      border-color: var(--color-warning);
+      box-shadow: var(--shadow-md), var(--shadow-glow-warning);
+      opacity: 0.9;
     }
 
     .card.updated {
-      border-color: #10b981;
-      animation: pulse-green 0.5s ease;
+      background: rgba(16, 185, 129, 0.05);
+      border-color: var(--color-success);
+      box-shadow: var(--shadow-md), var(--shadow-glow-success);
+      animation: pulse-green 0.6s ease;
     }
 
     @keyframes pulse-green {
@@ -105,19 +116,24 @@ export class CurrencyCard extends LitElement {
     }
 
     .currency-name {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #1f2937;
+      font-family: var(--font-family-display);
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-gray-800);
       flex: 1;
+      line-height: var(--line-height-snug);
     }
 
     .currency-code {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #6b7280;
-      background: #f3f4f6;
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.375rem;
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-gray-600);
+      background: var(--color-gray-100);
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.5rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
     .status-container {
@@ -133,55 +149,74 @@ export class CurrencyCard extends LitElement {
     }
 
     .amount {
-      font-size: 1.875rem;
-      font-weight: 600;
-      color: #1f2937;
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-gray-900);
       margin-bottom: 0.5rem;
       min-height: 2.5rem;
       display: flex;
       align-items: center;
+      line-height: var(--line-height-tight);
+      letter-spacing: -0.025em;
     }
 
     .amount-input {
-      font-size: 1.875rem;
-      font-weight: 600;
-      color: #1f2937;
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-gray-900);
       border: none;
       background: none;
       outline: none;
       width: 100%;
       padding: 0;
       margin: 0;
+      line-height: var(--line-height-tight);
+      letter-spacing: -0.025em;
     }
 
     .amount-input:focus {
-      color: #2563eb;
+      color: var(--color-primary);
     }
 
     .amount-input.unsaved {
-      color: #f59e0b;
-      background: rgba(245, 158, 11, 0.05);
+      color: var(--color-warning);
+      background: rgba(245, 158, 11, 0.08);
+      border-radius: 0.5rem;
+      padding: 0.25rem 0.5rem;
     }
 
     .submit-button {
-      margin-left: 0.5rem;
-      padding: 0.25rem 0.5rem;
-      background: #2563eb;
+      margin-left: 0.75rem;
+      padding: 0.375rem 0.75rem;
+      background: var(--color-primary-gradient);
       color: white;
       border: none;
-      border-radius: 0.375rem;
-      font-size: 0.75rem;
+      border-radius: 0.5rem;
+      font-family: var(--font-family-sans);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-sm);
+      transform: scale(1);
     }
 
     .submit-button:hover {
-      background: #1d4ed8;
+      transform: scale(1.05);
+      box-shadow: var(--shadow-md);
+    }
+
+    .submit-button:active {
+      transform: scale(0.98);
     }
 
     .submit-button:disabled {
-      background: #d1d5db;
+      background: var(--color-gray-300);
       cursor: not-allowed;
+      transform: scale(1);
+      box-shadow: none;
     }
 
     .currency-selector {
@@ -189,41 +224,63 @@ export class CurrencyCard extends LitElement {
       top: 100%;
       left: 0;
       right: 0;
-      background: white;
-      border: 2px solid #e5e7eb;
-      border-radius: 0.5rem;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      background: var(--color-surface-elevated);
+      backdrop-filter: var(--backdrop-blur);
+      border: 1px solid rgba(229, 231, 235, 0.2);
+      border-radius: 0.75rem;
+      box-shadow: var(--shadow-xl);
       max-height: 320px;
       overflow-y: auto;
       z-index: 1000;
-      margin-top: 0.25rem;
+      margin-top: 0.5rem;
+      animation: slideIn 0.2s ease-out;
     }
 
     .currency-selector input {
       width: 100%;
-      padding: 0.75rem;
+      padding: 1rem;
       border: none;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid rgba(229, 231, 235, 0.3);
       outline: none;
-      font-size: 0.875rem;
+      font-family: var(--font-family-sans);
+      font-size: var(--font-size-sm);
+      background: transparent;
+      color: var(--color-gray-800);
+      border-radius: 0.75rem 0.75rem 0 0;
+    }
+
+    .currency-selector input::placeholder {
+      color: var(--color-gray-500);
+    }
+
+    .currency-selector input:focus {
+      border-bottom-color: var(--color-primary);
     }
 
     .currency-option {
-      padding: 0.75rem;
+      padding: 0.875rem 1rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.75rem;
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 0.5rem;
+      margin: 0 0.25rem;
     }
 
     .currency-option:hover,
     .currency-option.highlighted {
-      background-color: #f3f4f6;
+      background: var(--color-surface-hover);
+      transform: translateX(4px);
+    }
+
+    .currency-option:last-child {
+      border-radius: 0 0 0.75rem 0.75rem;
     }
 
     .currency-option-flag {
-      font-size: 1rem;
+      font-size: var(--font-size-lg);
+      line-height: 1;
     }
 
     .currency-option-details {
@@ -231,28 +288,73 @@ export class CurrencyCard extends LitElement {
     }
 
     .currency-option-name {
-      font-weight: 500;
-      color: #1f2937;
+      font-family: var(--font-family-display);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-gray-800);
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-snug);
     }
 
     .currency-option-code {
-      font-size: 0.75rem;
-      color: #6b7280;
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-xs);
+      color: var(--color-gray-600);
+      letter-spacing: 0.5px;
+      margin-top: 0.125rem;
     }
 
     .hint {
-      font-size: 0.75rem;
-      color: #9ca3af;
+      font-family: var(--font-family-sans);
+      font-size: var(--font-size-xs);
+      color: var(--color-gray-500);
       font-style: italic;
       opacity: 0;
-      transition: opacity 0.2s;
+      transition: all 0.3s ease;
+      transform: translateY(2px);
     }
 
     .card:hover .hint {
       opacity: 1;
+      transform: translateY(0);
     }
 
+    /* Enhanced Mobile Responsiveness */
     @media (max-width: 640px) {
+      .card {
+        padding: 1.25rem;
+        min-height: 110px;
+        border-radius: 0.875rem;
+      }
+
+      .amount,
+      .amount-input {
+        font-size: var(--font-size-2xl);
+      }
+
+      .currency-name {
+        font-size: var(--font-size-base);
+      }
+
+      .currency-code {
+        font-size: var(--font-size-xs);
+        padding: 0.25rem 0.5rem;
+      }
+
+      .currency-selector {
+        max-height: 280px;
+      }
+
+      .currency-option {
+        padding: 1rem;
+      }
+
+      .hint {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 480px) {
       .card {
         padding: 1rem;
         min-height: 100px;
@@ -260,15 +362,11 @@ export class CurrencyCard extends LitElement {
 
       .amount,
       .amount-input {
-        font-size: 1.5rem;
+        font-size: var(--font-size-xl);
       }
 
       .currency-name {
-        font-size: 0.875rem;
-      }
-
-      .currency-code {
-        font-size: 0.75rem;
+        font-size: var(--font-size-sm);
       }
     }
   `;

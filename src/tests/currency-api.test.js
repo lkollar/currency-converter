@@ -295,4 +295,108 @@ describe("CurrencyAPI", () => {
       expect(currencyAPI.getCurrencyFlag("eur")).toBe("🇪🇺");
     });
   });
+
+  describe("Currency Name/Flag Alignment", () => {
+    it("should have perfect alignment between currency names and flags", () => {
+      // Get the actual internal mappings by accessing the implementation
+      const testInstance = new currencyAPI.constructor();
+
+      // Extract currency codes that have custom names (not just the code itself)
+      const currenciesWithNames = new Set();
+      const currenciesWithFlags = new Set();
+
+      // Test a wide range of currency codes to find which have custom mappings
+      const allPossibleCurrencies = [
+        "USD",
+        "EUR",
+        "GBP",
+        "JPY",
+        "CAD",
+        "AUD",
+        "CHF",
+        "CNY",
+        "INR",
+        "KRW",
+        "SGD",
+        "HKD",
+        "NOK",
+        "SEK",
+        "DKK",
+        "PLN",
+        "CZK",
+        "HUF",
+        "RUB",
+        "BRL",
+        "MXN",
+        "ZAR",
+        "NZD",
+        "TRY",
+        "AED",
+        "THB",
+        "MYR",
+        "IDR",
+        "PHP",
+        "VND",
+        "ILS",
+        "EGP",
+        "SAR",
+        "QAR",
+        "KWD",
+        "BHD",
+        "OMR",
+        "JOD",
+        "LBP",
+        "RON",
+        "BGN",
+        "HRK",
+        "RSD",
+        "ISK",
+        "CLP",
+        "PEN",
+        "COP",
+        "ARS",
+        "UYU",
+        "TWD",
+        "XYZ",
+        "ABC",
+        "DEF", // Test some invalid codes too
+      ];
+
+      allPossibleCurrencies.forEach((currency) => {
+        const name = testInstance.getCurrencyName(currency);
+        const flag = testInstance.getCurrencyFlag(currency);
+
+        // If currency has a proper name (not just the code), add to names set
+        if (name !== currency) {
+          currenciesWithNames.add(currency);
+        }
+
+        // If currency has a custom flag (not default), add to flags set
+        if (flag !== "🏳️") {
+          currenciesWithFlags.add(currency);
+        }
+      });
+
+      // Find currencies that have names but no flags
+      const namesWithoutFlags = [...currenciesWithNames].filter(
+        (currency) => !currenciesWithFlags.has(currency),
+      );
+
+      // Find currencies that have flags but no names
+      const flagsWithoutNames = [...currenciesWithFlags].filter(
+        (currency) => !currenciesWithNames.has(currency),
+      );
+
+      // The intersection of mismatched currencies should be empty
+      expect(namesWithoutFlags).toEqual([]);
+      expect(flagsWithoutNames).toEqual([]);
+
+      // Ensure we have substantial coverage
+      expect(currenciesWithNames.size).toBeGreaterThan(20);
+      expect(currenciesWithFlags.size).toBeGreaterThan(20);
+
+      // Ensure perfect alignment
+      expect(currenciesWithNames.size).toBe(currenciesWithFlags.size);
+    });
+  });
 });

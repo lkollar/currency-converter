@@ -175,6 +175,20 @@ body {
   --breakpoint-xl: 1280px;
 }
 
+/* Offline Indicator */
+.offline-indicator {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1rem;
+}
+
 /* Utility classes */
 .sr-only {
   position: absolute;

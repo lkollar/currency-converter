@@ -208,6 +208,7 @@ export class CurrencyApp extends LitElement {
     _isLoading: { state: true },
     _error: { state: true },
     _lastUpdated: { state: true },
+    _isOnline: { state: true },
   };
 
   constructor() {
@@ -215,6 +216,7 @@ export class CurrencyApp extends LitElement {
     this._isLoading = false;
     this._error = null;
     this._lastUpdated = null;
+    this._isOnline = navigator.onLine; // Initial online status
 
     // Subscribe to store changes
     this._unsubscribe = currencyStore.subscribe((store) => {
@@ -222,9 +224,12 @@ export class CurrencyApp extends LitElement {
       this._error = store.error;
       this._lastUpdated = store.lastUpdated;
     });
+
+    // Bind event handler
+    this._handleOnlineStatusChange = this._handleOnlineStatusChange.bind(this);
   }
 
-  async connectedCallback() {
+  connectedCallback() {
     super.connectedCallback();
 
     // Initialize the app
@@ -233,6 +238,12 @@ export class CurrencyApp extends LitElement {
     } catch (error) {
       console.error("Failed to initialize app:", error);
     }
+
+    // Listen for online/offline status changes
+    window.addEventListener(
+      "app-online-status-changed",
+      this._handleOnlineStatusChange,
+    );
   }
 
   disconnectedCallback() {
@@ -240,6 +251,14 @@ export class CurrencyApp extends LitElement {
     if (this._unsubscribe) {
       this._unsubscribe();
     }
+    window.removeEventListener(
+      "app-online-status-changed",
+      this._handleOnlineStatusChange,
+    );
+  }
+
+  _handleOnlineStatusChange(event) {
+    this._isOnline = event.detail.isOnline;
   }
 
   async _handleRefresh() {
@@ -289,10 +308,13 @@ export class CurrencyApp extends LitElement {
         <div class="last-updated">
           🔄 Last updated: ${this._formatLastUpdated()}
         </div>
+        ${!this._isOnline
+          ? html`<div class="offline-indicator">Offline Mode</div>`
+          : ""}
         <button
           class="refresh-btn"
           @click=${this._handleRefresh}
-          ?disabled=${this._isLoading}
+          ?disabled=${this._isLoading || !this._isOnline}
         >
           ${this._isLoading ? "Refreshing..." : "Refresh"}
         </button>

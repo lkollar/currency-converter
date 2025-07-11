@@ -50,6 +50,20 @@ window.addEventListener("appinstalled", (evt) => {
   deferredPrompt = null;
 });
 
+// Handle online/offline status
+function updateOnlineStatus() {
+  const event = new CustomEvent("app-online-status-changed", {
+    detail: { isOnline: navigator.onLine },
+  });
+  window.dispatchEvent(event);
+}
+
+window.addEventListener("online", updateOnlineStatus);
+window.addEventListener("offline", updateOnlineStatus);
+
+// Initial check
+updateOnlineStatus();
+
 // Export for components to use
 window.installPWA = async () => {
   if (deferredPrompt) {

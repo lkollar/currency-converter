@@ -1,4 +1,5 @@
 import { currencyStore } from "../store/currency-store.js";
+import { currencyData, majorCurrencies } from "../utils/currency-data.js";
 
 class CurrencyAPI {
   constructor() {
@@ -92,6 +93,11 @@ class CurrencyAPI {
       .sort();
   }
 
+  // Get list of major currencies
+  getMajorCurrencies() {
+    return majorCurrencies;
+  }
+
   // Check if currency is supported
   isCurrencySupported(currency) {
     const code = currency.toLowerCase();
@@ -100,118 +106,14 @@ class CurrencyAPI {
 
   // Get currency name/description (basic mapping)
   getCurrencyName(currency) {
-    const names = {
-      USD: "US Dollar",
-      EUR: "Euro",
-      GBP: "British Pound",
-      JPY: "Japanese Yen",
-      CAD: "Canadian Dollar",
-      AUD: "Australian Dollar",
-      CHF: "Swiss Franc",
-      CNY: "Chinese Yuan",
-      INR: "Indian Rupee",
-      KRW: "South Korean Won",
-      SGD: "Singapore Dollar",
-      HKD: "Hong Kong Dollar",
-      NOK: "Norwegian Krone",
-      SEK: "Swedish Krona",
-      DKK: "Danish Krone",
-      PLN: "Polish Zloty",
-      CZK: "Czech Koruna",
-      HUF: "Hungarian Forint",
-      RUB: "Russian Ruble",
-      BRL: "Brazilian Real",
-      MXN: "Mexican Peso",
-      ZAR: "South African Rand",
-      NZD: "New Zealand Dollar",
-      TRY: "Turkish Lira",
-      AED: "UAE Dirham",
-      THB: "Thai Baht",
-      MYR: "Malaysian Ringgit",
-      IDR: "Indonesian Rupiah",
-      PHP: "Philippine Peso",
-      VND: "Vietnamese Dong",
-      ILS: "Israeli Shekel",
-      EGP: "Egyptian Pound",
-      SAR: "Saudi Riyal",
-      QAR: "Qatari Riyal",
-      KWD: "Kuwaiti Dinar",
-      BHD: "Bahraini Dinar",
-      OMR: "Omani Rial",
-      JOD: "Jordanian Dinar",
-      LBP: "Lebanese Pound",
-      RON: "Romanian Leu",
-      BGN: "Bulgarian Lev",
-      HRK: "Croatian Kuna",
-      RSD: "Serbian Dinar",
-      ISK: "Icelandic Krona",
-      CLP: "Chilean Peso",
-      PEN: "Peruvian Sol",
-      COP: "Colombian Peso",
-      ARS: "Argentine Peso",
-      UYU: "Uruguayan Peso",
-      TWD: "Taiwan Dollar",
-    };
-
-    return names[currency.toUpperCase()] || currency.toUpperCase();
+    const code = currency.toUpperCase();
+    return currencyData[code]?.name || code;
   }
 
   // Get currency flag emoji
   getCurrencyFlag(currency) {
-    const flags = {
-      USD: "🇺🇸",
-      EUR: "🇪🇺",
-      GBP: "🇬🇧",
-      JPY: "🇯🇵",
-      CAD: "🇨🇦",
-      AUD: "🇦🇺",
-      CHF: "🇨🇭",
-      CNY: "🇨🇳",
-      INR: "🇮🇳",
-      KRW: "🇰🇷",
-      SGD: "🇸🇬",
-      HKD: "🇭🇰",
-      NOK: "🇳🇴",
-      SEK: "🇸🇪",
-      DKK: "🇩🇰",
-      PLN: "🇵🇱",
-      CZK: "🇨🇿",
-      HUF: "🇭🇺",
-      RUB: "🇷🇺",
-      BRL: "🇧🇷",
-      MXN: "🇲🇽",
-      ZAR: "🇿🇦",
-      NZD: "🇳🇿",
-      TRY: "🇹🇷",
-      AED: "🇦🇪",
-      THB: "🇹🇭",
-      MYR: "🇲🇾",
-      IDR: "🇮🇩",
-      PHP: "🇵🇭",
-      VND: "🇻🇳",
-      ILS: "🇮🇱",
-      EGP: "🇪🇬",
-      SAR: "🇸🇦",
-      QAR: "🇶🇦",
-      KWD: "🇰🇼",
-      BHD: "🇧🇭",
-      OMR: "🇴🇲",
-      JOD: "🇯🇴",
-      LBP: "🇱🇧",
-      RON: "🇷🇴",
-      BGN: "🇧🇬",
-      HRK: "🇭🇷",
-      RSD: "🇷🇸",
-      ISK: "🇮🇸",
-      CLP: "🇨🇱",
-      PEN: "🇵🇪",
-      COP: "🇨🇴",
-      ARS: "🇦🇷",
-      UYU: "🇺🇾",
-      TWD: "🇹🇼",
-    };
-
-    return flags[currency.toUpperCase()] || "🏳️";
+    const code = currency.toUpperCase();
+    return currencyData[code]?.flag || "🏳️";
   }
 }
 

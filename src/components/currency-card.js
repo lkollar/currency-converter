@@ -540,47 +540,7 @@ export class CurrencyCard extends LitElement {
 
   _updateFilteredCurrencies() {
     // Focus on major currencies with proper flags
-    const majorCurrencies = [
-      "USD",
-      "EUR",
-      "GBP",
-      "JPY",
-      "CAD",
-      "AUD",
-      "CHF",
-      "CNY",
-      "INR",
-      "KRW",
-      "SGD",
-      "HKD",
-      "NOK",
-      "SEK",
-      "DKK",
-      "PLN",
-      "CZK",
-      "HUF",
-      "RUB",
-      "BRL",
-      "MXN",
-      "ZAR",
-      "NZD",
-      "TRY",
-      "AED",
-      "THB",
-      "MYR",
-      "IDR",
-      "PHP",
-      "VND",
-      "ILS",
-      "EGP",
-      "SAR",
-      "QAR",
-      "KWD",
-      "BHD",
-      "OMR",
-      "JOD",
-      "LBP",
-    ];
+    const majorCurrencies = currencyAPI.getMajorCurrencies();
 
     const filter = this._selectorFilter.toLowerCase();
     const currentUserCurrencies = currencyStore.userCurrencies;

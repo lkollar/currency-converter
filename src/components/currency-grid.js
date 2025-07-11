@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { currencyStore } from "../store/currency-store.js";
+import { currencyAPI } from "../services/currency-api.js";
 import "./currency-card.js";
 
 export class CurrencyGrid extends LitElement {
@@ -314,59 +315,8 @@ export class CurrencyGrid extends LitElement {
   }
 
   _updateFilteredAddCurrencies() {
-    // Major currencies with proper ordering
-    const majorCurrencies = [
-      "USD",
-      "EUR",
-      "GBP",
-      "JPY",
-      "CAD",
-      "AUD",
-      "CHF",
-      "CNY",
-      "INR",
-      "KRW",
-      "SGD",
-      "HKD",
-      "NOK",
-      "SEK",
-      "DKK",
-      "PLN",
-      "CZK",
-      "HUF",
-      "RUB",
-      "BRL",
-      "MXN",
-      "ZAR",
-      "NZD",
-      "TRY",
-      "AED",
-      "THB",
-      "MYR",
-      "IDR",
-      "PHP",
-      "VND",
-      "TWD",
-      "ILS",
-      "CLP",
-      "COP",
-      "PEN",
-      "ARS",
-      "UYU",
-      "ISK",
-      "HRK",
-      "BGN",
-      "RON",
-      "UAH",
-      "KZT",
-      "EGP",
-      "MAD",
-      "TND",
-      "KES",
-      "GHS",
-      "NGN",
-      "ETB",
-    ];
+    // Get major currencies from the API
+    const majorCurrencies = currencyAPI.getMajorCurrencies();
 
     // Filter out currencies already in use
     const availableCurrencies = majorCurrencies.filter(
@@ -377,7 +327,7 @@ export class CurrencyGrid extends LitElement {
     const filter = this._addCurrencyFilter.toLowerCase();
     this._filteredAddCurrencies = availableCurrencies.filter((currency) => {
       const currencyCode = currency.toLowerCase();
-      const currencyName = this._getCurrencyName(currency).toLowerCase();
+      const currencyName = currencyAPI.getCurrencyName(currency).toLowerCase();
       return currencyCode.includes(filter) || currencyName.includes(filter);
     });
   }
@@ -408,101 +358,11 @@ export class CurrencyGrid extends LitElement {
   }
 
   _getCurrencyName(currency) {
-    const names = {
-      USD: "US Dollar",
-      EUR: "Euro",
-      GBP: "British Pound",
-      JPY: "Japanese Yen",
-      CAD: "Canadian Dollar",
-      AUD: "Australian Dollar",
-      CHF: "Swiss Franc",
-      CNY: "Chinese Yuan",
-      INR: "Indian Rupee",
-      KRW: "South Korean Won",
-      SGD: "Singapore Dollar",
-      HKD: "Hong Kong Dollar",
-      NOK: "Norwegian Krone",
-      SEK: "Swedish Krona",
-      DKK: "Danish Krone",
-      PLN: "Polish Zloty",
-      CZK: "Czech Koruna",
-      HUF: "Hungarian Forint",
-      RUB: "Russian Ruble",
-      BRL: "Brazilian Real",
-      MXN: "Mexican Peso",
-      ZAR: "South African Rand",
-      NZD: "New Zealand Dollar",
-      TRY: "Turkish Lira",
-      AED: "UAE Dirham",
-      THB: "Thai Baht",
-      MYR: "Malaysian Ringgit",
-      IDR: "Indonesian Rupiah",
-      PHP: "Philippine Peso",
-      VND: "Vietnamese Dong",
-      TWD: "Taiwan Dollar",
-      ILS: "Israeli Shekel",
-      CLP: "Chilean Peso",
-      COP: "Colombian Peso",
-      PEN: "Peruvian Sol",
-      ARS: "Argentine Peso",
-      UYU: "Uruguayan Peso",
-      ISK: "Icelandic Krona",
-      HRK: "Croatian Kuna",
-      BGN: "Bulgarian Lev",
-      RON: "Romanian Leu",
-      UAH: "Ukrainian Hryvnia",
-      KZT: "Kazakhstani Tenge",
-      EGP: "Egyptian Pound",
-      MAD: "Moroccan Dirham",
-      TND: "Tunisian Dinar",
-      KES: "Kenyan Shilling",
-      GHS: "Ghanaian Cedi",
-      NGN: "Nigerian Naira",
-      ETB: "Ethiopian Birr",
-    };
-    return names[currency] || currency;
+    return currencyAPI.getCurrencyName(currency);
   }
 
   _getCurrencyFlag(currency) {
-    const flags = {
-      USD: "🇺🇸",
-      EUR: "🇪🇺",
-      GBP: "🇬🇧",
-      JPY: "🇯🇵",
-      CAD: "🇨🇦",
-      AUD: "🇦🇺",
-      CHF: "🇨🇭",
-      CNY: "🇨🇳",
-      INR: "🇮🇳",
-      KRW: "🇰🇷",
-      SGD: "🇸🇬",
-      HKD: "🇭🇰",
-      NOK: "🇳🇴",
-      SEK: "🇸🇪",
-      DKK: "🇩🇰",
-      PLN: "🇵🇱",
-      CZK: "🇨🇿",
-      HUF: "🇭🇺",
-      RUB: "🇷🇺",
-      BRL: "🇧🇷",
-      MXN: "🇲🇽",
-      ZAR: "🇿🇦",
-      NZD: "🇳🇿",
-      TRY: "🇹🇷",
-      AED: "🇦🇪",
-      THB: "🇹🇭",
-      MYR: "🇲🇾",
-      IDR: "🇮🇩",
-      PHP: "🇵🇭",
-      VND: "🇻🇳",
-      TWD: "🇹🇼",
-      ILS: "🇮🇱",
-      CLP: "🇨🇱",
-      COP: "🇨🇴",
-      PEN: "🇵🇪",
-      ARS: "🇦🇷",
-    };
-    return flags[currency] || "🏳️";
+    return currencyAPI.getCurrencyFlag(currency);
   }
 
   _handleCurrencyChanged(e) {

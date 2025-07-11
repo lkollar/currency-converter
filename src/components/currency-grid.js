@@ -424,10 +424,51 @@ export class CurrencyGrid extends LitElement {
     if (this._userCurrencies.length === 0) {
       return html`
         <div class="empty-state">
-          <h3>No currencies selected</h3>
-          <p>Add some currencies to start converting between them.</p>
+          <h3>Welcome to Currency Converter!</h3>
+          <p>Start by adding some currencies to your list.</p>
+          <div class="add-currency-picker">
+            <div class="add-currency" @click=${this._handleAddCurrency}>
+              <div class="add-currency-icon">+</div>
+              <div class="add-currency-text">Add Your First Currency</div>
+            </div>
+            ${this._showAddCurrencyPicker
+              ? html`
+                  <div class="currency-selector">
+                    <input
+                      type="text"
+                      placeholder="Search currencies..."
+                      .value=${this._addCurrencyFilter}
+                      @input=${this._handleAddCurrencyFilter}
+                      @click=${(e) => e.stopPropagation()}
+                    />
+                    <div class="currency-options">
+                      ${this._filteredAddCurrencies.map(
+                        (currency) => html`
+                          <div
+                            class="currency-option"
+                            @click=${() => this._selectAddCurrency(currency)}
+                          >
+                            <div class="currency-option-flag">
+                              ${this._getCurrencyFlag(currency)}
+                            </div>
+                            <div class="currency-option-info">
+                              <div class="currency-option-name">
+                                ${this._getCurrencyName(currency)}
+                              </div>
+                              <div class="currency-option-code">
+                                ${currency}
+                              </div>
+                            </div>
+                          </div>
+                        `,
+                      )}
+                    </div>
+                  </div>
+                `
+              : ""}
+          </div>
           <button class="setup-btn" @click=${this._handleSetupDefaults}>
-            Add Popular Currencies
+            Add Popular Currencies (USD, EUR, GBP, JPY)
           </button>
         </div>
       `;

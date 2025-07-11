@@ -6,7 +6,7 @@ class CurrencyStore {
     this.rates = {};
 
     // User's selected currencies
-    this.userCurrencies = ["USD", "EUR", "GBP", "JPY"];
+    this.userCurrencies = [];
 
     // Currently active currency for input
     this.activeCurrency = "USD";
@@ -202,12 +202,7 @@ class CurrencyStore {
       if (stored) {
         const state = JSON.parse(stored);
         this.rates = state.rates || {};
-        this.userCurrencies = state.userCurrencies || [
-          "USD",
-          "EUR",
-          "GBP",
-          "JPY",
-        ];
+        this.userCurrencies = state.userCurrencies || [];
         this.activeCurrency = state.activeCurrency || "USD";
         this.activeAmount = state.activeAmount || 1000;
         this.lastUpdated = state.lastUpdated || null;

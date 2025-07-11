@@ -229,7 +229,7 @@ export class CurrencyApp extends LitElement {
     this._handleOnlineStatusChange = this._handleOnlineStatusChange.bind(this);
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
 
     // Initialize the app

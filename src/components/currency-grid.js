@@ -303,10 +303,10 @@ export class CurrencyGrid extends LitElement {
     this._rates = { ...currencyStore.rates };
   }
 
-  _handleAddCurrency() {
+  async _handleAddCurrency() {
     this._showAddCurrencyPicker = true;
     this._addCurrencyFilter = "";
-    this._updateFilteredAddCurrencies();
+    await this._updateFilteredAddCurrencies();
 
     // Add global click listener when picker opens
     setTimeout(() => {
@@ -337,9 +337,9 @@ export class CurrencyGrid extends LitElement {
     this._closeAddCurrencyPicker();
   }
 
-  _handleAddCurrencyFilter(e) {
+  async _handleAddCurrencyFilter(e) {
     this._addCurrencyFilter = e.target.value;
-    this._updateFilteredAddCurrencies();
+    await this._updateFilteredAddCurrencies();
   }
 
   _closeAddCurrencyPicker() {

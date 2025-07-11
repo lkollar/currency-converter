@@ -297,7 +297,7 @@ export class CurrencyApp extends LitElement {
 
       ${this._error
         ? html`
-            <div class="error"><strong>Error:</strong> ${this._error}</div>
+            <div class="error" role="alert" aria-live="polite"><strong>Error:</strong> ${this._error}</div>
           `
         : ""}
       ${this._isLoading
@@ -315,6 +315,7 @@ export class CurrencyApp extends LitElement {
           class="refresh-btn"
           @click=${this._handleRefresh}
           ?disabled=${this._isLoading || !this._isOnline}
+          aria-label="Refresh exchange rates"
         >
           ${this._isLoading ? "Refreshing..." : "Refresh"}
         </button>

@@ -785,8 +785,29 @@ export class CurrencyCard extends LitElement {
       .join(" ");
 
     return html`
-      <div class="${cardClasses}" @click=${this._handleCardClick}>
-        <div class="currency-header" @click=${this._handleCurrencyHeaderClick}>
+      <div
+        class="${cardClasses}"
+        role="button"
+        tabindex="0"
+        @click=${this._handleCardClick}
+        @keydown=${(e) => {
+          if (e.key === 'Enter' || e.key === ' ') this._handleCardClick(e);
+        }}
+        aria-label="Activate ${this.currency} currency card"
+      >
+        <div
+          class="currency-header"
+          @click=${this._handleCurrencyHeaderClick}
+          @keydown=${(e) => {
+            if (e.key === 'Enter' || e.key === ' ')
+              this._handleCurrencyHeaderClick(e);
+          }}
+          role="button"
+          tabindex="0"
+          aria-haspopup="listbox"
+          aria-expanded="${this._showSelector}"
+          aria-label="Change currency for this card"
+        >
           <span class="currency-name"
             >${this._getCurrencyFlag()} ${this._getCurrencyName()}</span
           >
@@ -796,6 +817,7 @@ export class CurrencyCard extends LitElement {
             ?disabled=${!this._canRemove}
             @click=${this._handleRemoveClick}
             title="Remove currency"
+            aria-label="Remove ${this.currency} currency"
           >
             ×
           </button>
@@ -819,6 +841,8 @@ export class CurrencyCard extends LitElement {
                   @blur=${this._handleInputBlur}
                   @click=${(e) => e.stopPropagation()}
                   placeholder="0.00"
+                  inputmode="decimal"
+                  aria-label="Amount in ${this.currency}"
                 />
                 ${this._hasUnsavedChanges
                   ? html`
@@ -826,6 +850,7 @@ export class CurrencyCard extends LitElement {
                         class="submit-button"
                         @click=${this._handleSubmitClick}
                         title="Submit value (or press Enter)"
+                        aria-label="Submit amount"
                       >
                         ✓
                       </button>
@@ -840,14 +865,18 @@ export class CurrencyCard extends LitElement {
               <div
                 class="currency-selector"
                 @click=${(e) => e.stopPropagation()}
+                role="listbox"
+                aria-label="Currency selection"
               >
                 <input
-                  type="text"
-                  placeholder="Search currencies..."
-                  .value=${this._selectorFilter}
-                  @input=${this._handleSelectorInput}
-                  @keydown=${this._handleSelectorKeyDown}
-                />
+                    type="text"
+                    placeholder="Search currencies..."
+                    .value=${this._selectorFilter}
+                    @input=${this._handleSelectorInput}
+                    @keydown=${this._handleSelectorKeyDown}
+                    role="searchbox"
+                    aria-label="Search currencies"
+                  />
                 ${this._filteredCurrencies.map(
                   (code, index) => html`
                     <div
@@ -855,6 +884,13 @@ export class CurrencyCard extends LitElement {
                         ? "highlighted"
                         : ""}"
                       @click=${() => this._handleOptionClick(code)}
+                      role="option"
+                      aria-selected="${index === this._highlightedIndex}"
+                      tabindex="0"
+                      @keydown=${(e) => {
+                        if (e.key === 'Enter' || e.key === ' ')
+                          this._handleOptionClick(code);
+                      }}
                     >
                       <span class="currency-option-flag"
                         >${currencyAPI.getCurrencyFlag(code)}</span

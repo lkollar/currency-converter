@@ -427,7 +427,7 @@ export class CurrencyGrid extends LitElement {
           <h3>Welcome to Currency Converter!</h3>
           <p>Start by adding some currencies to your list.</p>
           <div class="add-currency-picker">
-            <div class="add-currency" @click=${this._handleAddCurrency}>
+            <div class="add-currency" @click=${this._handleAddCurrency} role="button" tabindex="0" aria-label="Add your first currency">
               <div class="add-currency-icon">+</div>
               <div class="add-currency-text">Add Your First Currency</div>
             </div>
@@ -467,7 +467,7 @@ export class CurrencyGrid extends LitElement {
                 `
               : ""}
           </div>
-          <button class="setup-btn" @click=${this._handleSetupDefaults}>
+          <button class="setup-btn" @click=${this._handleSetupDefaults} aria-label="Add popular currencies USD, EUR, GBP, JPY">
             Add Popular Currencies (USD, EUR, GBP, JPY)
           </button>
         </div>
@@ -485,7 +485,7 @@ export class CurrencyGrid extends LitElement {
     }
 
     return html`
-      <div class="grid">
+      <div class="grid" role="group" aria-labelledby="currency-grid-title">
         ${this._userCurrencies.map(
           (currency, index) => html`
             <div
@@ -499,6 +499,9 @@ export class CurrencyGrid extends LitElement {
               @dragover=${this._handleDragOver}
               @dragleave=${this._handleDragLeave}
               @drop=${this._handleDrop}
+              role="listitem"
+              aria-grabbed="${this._draggedIndex === index}"
+              tabindex="0"
             >
               <currency-card
                 currency=${currency}
@@ -509,7 +512,7 @@ export class CurrencyGrid extends LitElement {
         )}
 
         <div class="add-currency-picker">
-          <div class="add-currency" @click=${this._handleAddCurrency}>
+          <div class="add-currency" @click=${this._handleAddCurrency} role="button" tabindex="0" aria-label="Add new currency">
             <div class="add-currency-icon">+</div>
             <div class="add-currency-text">Add Currency</div>
           </div>
@@ -523,6 +526,8 @@ export class CurrencyGrid extends LitElement {
                     .value=${this._addCurrencyFilter}
                     @input=${this._handleAddCurrencyFilter}
                     @click=${(e) => e.stopPropagation()}
+                    role="searchbox"
+                    aria-label="Search currencies to add"
                   />
                   <div class="currency-options">
                     ${this._filteredAddCurrencies.map(
@@ -530,6 +535,12 @@ export class CurrencyGrid extends LitElement {
                         <div
                           class="currency-option"
                           @click=${() => this._selectAddCurrency(currency)}
+                          role="option"
+                          tabindex="0"
+                          @keydown=${(e) => {
+                            if (e.key === 'Enter' || e.key === ' ')
+                              this._selectAddCurrency(currency);
+                          }}
                         >
                           <div class="currency-option-flag">
                             ${this._getCurrencyFlag(currency)}

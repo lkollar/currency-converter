@@ -74,24 +74,22 @@ describe("CurrencyAPI", () => {
       });
 
       await expect(currencyAPI.fetchRates()).rejects.toThrow(
-        "HTTP error! status: 404",
+        "API fetch failed and no cached data is available.",
       );
 
       expect(currencyStore.setLoading).toHaveBeenCalledWith(true);
       expect(currencyStore.setLoading).toHaveBeenCalledWith(false);
-      expect(currencyStore.setError).toHaveBeenCalledWith(
-        "HTTP error! status: 404",
-      );
+      expect(currencyStore.setError).toHaveBeenCalledWith("Could not fetch new rates. Displaying last saved data.");
     });
 
     it("should handle network errors", async () => {
       fetch.mockRejectedValueOnce(new Error("Network error"));
 
-      await expect(currencyAPI.fetchRates()).rejects.toThrow("Network error");
+      await expect(currencyAPI.fetchRates()).rejects.toThrow("API fetch failed and no cached data is available.");
 
       expect(currencyStore.setLoading).toHaveBeenCalledWith(true);
       expect(currencyStore.setLoading).toHaveBeenCalledWith(false);
-      expect(currencyStore.setError).toHaveBeenCalledWith("Network error");
+      expect(currencyStore.setError).toHaveBeenCalledWith("Could not fetch new rates. Displaying last saved data.");
     });
 
     it("should handle invalid API response format", async () => {
@@ -106,7 +104,7 @@ describe("CurrencyAPI", () => {
       });
 
       await expect(currencyAPI.fetchRates()).rejects.toThrow(
-        "Invalid API response format",
+        "API fetch failed and no cached data is available.",
       );
     });
   });
@@ -210,30 +208,40 @@ describe("CurrencyAPI", () => {
 
       fetch.mockRejectedValueOnce(new Error("Network error"));
 
-      await expect(currencyAPI.initialize()).rejects.toThrow("Network error");
+      await expect(currencyAPI.initialize()).rejects.toThrow("API fetch failed and no cached data is available.");
     });
   });
 
   describe("getAvailableCurrencies", () => {
-    it("should return sorted list of available currencies", () => {
-      currencyStore.rates = {
-        usd: 1,
-        eur: 0.92,
-        gbp: 0.79,
-        jpy: 149.85,
-      };
-
-      const result = currencyAPI.getAvailableCurrencies();
+    it("should return sorted list of available currencies", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          usd: "US Dollar",
+          eur: "Euro",
+          gbp: "British Pound",
+          jpy: "Japanese Yen",
+        }),
+      });
+      const result = await currencyAPI.getAvailableCurrencies();
 
       expect(result).toEqual(["EUR", "GBP", "JPY", "USD"]);
     });
 
-    it("should return empty array if no rates available", () => {
-      currencyStore.rates = {};
+    it("should return major currencies if no rates available from API", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({}), // Simulate no currencies available from API
+      });
+      const result = await currencyAPI.getAvailableCurrencies();
 
-      const result = currencyAPI.getAvailableCurrencies();
-
-      expect(result).toEqual([]);
+      // Expect fallback to majorCurrencies
+      expect(result).toEqual([
+        "USD", "EUR", "GBP", "JPY", "CAD", "AUD", "CHF", "CNY", "INR", "KRW", 
+        "SGD", "HKD", "NOK", "SEK", "DKK", "PLN", "CZK", "HUF", "RUB", "BRL", 
+        "MXN", "ZAR", "NZD", "TRY", "AED", "THB", "MYR", "IDR", "PHP", "VND", 
+        "ILS", "EGP", "SAR", "QAR", "KWD", "BHD", "OMR", "JOD", "LBP",
+      ]);
     });
   });
 

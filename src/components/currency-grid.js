@@ -306,6 +306,8 @@ export class CurrencyGrid extends LitElement {
   async _handleAddCurrency() {
     this._showAddCurrencyPicker = true;
     this._addCurrencyFilter = "";
+    this._filteredAddCurrencies = []; // Clear previous results
+    this.requestUpdate(); // Trigger re-render to show loading state
     await this._updateFilteredAddCurrencies();
 
     // Add global click listener when picker opens
@@ -339,6 +341,8 @@ export class CurrencyGrid extends LitElement {
 
   async _handleAddCurrencyFilter(e) {
     this._addCurrencyFilter = e.target.value;
+    this._filteredAddCurrencies = []; // Clear previous results
+    this.requestUpdate(); // Trigger re-render to show loading state
     await this._updateFilteredAddCurrencies();
   }
 
@@ -530,30 +534,38 @@ export class CurrencyGrid extends LitElement {
                     aria-label="Search currencies to add"
                   />
                   <div class="currency-options">
-                    ${this._filteredAddCurrencies.map(
-                      (currency) => html`
-                        <div
-                          class="currency-option"
-                          @click=${() => this._selectAddCurrency(currency)}
-                          role="option"
-                          tabindex="0"
-                          @keydown=${(e) => {
-                            if (e.key === 'Enter' || e.key === ' ')
-                              this._selectAddCurrency(currency);
-                          }}
-                        >
-                          <div class="currency-option-flag">
-                            ${this._getCurrencyFlag(currency)}
-                          </div>
-                          <div class="currency-option-info">
-                            <div class="currency-option-name">
-                              ${this._getCurrencyName(currency)}
+                    ${this._filteredAddCurrencies.length === 0 &&
+                    this._addCurrencyFilter.length === 0
+                      ? html`<div class="empty-state">Loading currencies...</div>`
+                      : this._filteredAddCurrencies.length === 0 &&
+                        this._addCurrencyFilter.length > 0
+                      ? html`<div class="empty-state">No matching currencies found.</div>`
+                      : this._filteredAddCurrencies.map(
+                          (currency) => html`
+                            <div
+                              class="currency-option"
+                              @click=${() => this._selectAddCurrency(currency)}
+                              role="option"
+                              tabindex="0"
+                              @keydown=${(e) => {
+                                if (e.key === 'Enter' || e.key === ' ')
+                                  this._selectAddCurrency(currency);
+                              }}
+                            >
+                              <div class="currency-option-flag">
+                                ${this._getCurrencyFlag(currency)}
+                              </div>
+                              <div class="currency-option-info">
+                                <div class="currency-option-name">
+                                  ${this._getCurrencyName(currency)}
+                                </div>
+                                <div class="currency-option-code">
+                                  ${currency}
+                                </div>
+                              </div>
                             </div>
-                            <div class="currency-option-code">${currency}</div>
-                          </div>
-                        </div>
-                      `,
-                    )}
+                          `,
+                        )}
                   </div>
                 </div>
               `

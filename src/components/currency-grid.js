@@ -314,12 +314,12 @@ export class CurrencyGrid extends LitElement {
     }, 0);
   }
 
-  _updateFilteredAddCurrencies() {
-    // Get major currencies from the API
-    const majorCurrencies = currencyAPI.getMajorCurrencies();
+  async _updateFilteredAddCurrencies() {
+    // Get all available currencies from the API
+    const allCurrencies = await currencyAPI.getAvailableCurrencies();
 
     // Filter out currencies already in use
-    const availableCurrencies = majorCurrencies.filter(
+    const availableCurrencies = allCurrencies.filter(
       (currency) => !this._userCurrencies.includes(currency),
     );
 

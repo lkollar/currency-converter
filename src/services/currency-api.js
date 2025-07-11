@@ -88,15 +88,36 @@ class CurrencyAPI {
     return await this.fetchRates();
   }
 
-  // Get list of available currencies
-  getAvailableCurrencies() {
-    const rates = currencyStore.rates;
-    return Object.keys(rates)
-      .map((code) => code.toUpperCase())
-      .sort();
+  // Fetch all available currencies from API
+  async fetchAllCurrencies() {
+    try {
+      const response = await fetch(`${this.baseUrl}.json`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch all currencies: ${response.status}`);
+      }
+      const data = await response.json();
+      // The API returns an object like { "usd": "United States Dollar", ... }
+      // Convert it to an array of currency codes
+      return Object.keys(data).map(code => code.toUpperCase()).sort();
+    } catch (error) {
+      console.error("Failed to fetch all currencies:", error);
+      return []; // Return empty array on error
+    }
   }
 
-  // Get list of major currencies
+  // Get list of available currencies (from fetched data or major currencies as fallback)
+  async getAvailableCurrencies() {
+    // Try to fetch all currencies from the API
+    const allCurrencies = await this.fetchAllCurrencies();
+    if (allCurrencies.length > 0) {
+      return allCurrencies;
+    } else {
+      // Fallback to major currencies if API fetch fails
+      return majorCurrencies;
+    }
+  }
+
+  // Get list of major currencies (for specific use cases where a smaller list is preferred)
   getMajorCurrencies() {
     return majorCurrencies;
   }

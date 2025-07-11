@@ -254,12 +254,17 @@ export class CurrencyApp extends LitElement {
     if (!this._lastUpdated) return "Never";
 
     const date = new Date(this._lastUpdated);
-    return date.toLocaleString(undefined, {
+    const formattedDate = date.toLocaleString(undefined, {
       month: "short",
       day: "numeric",
       hour: "numeric",
       minute: "2-digit",
     });
+
+    if (currencyStore.areRatesStale()) {
+      return `${formattedDate} (Stale)`;
+    }
+    return formattedDate;
   }
 
   render() {

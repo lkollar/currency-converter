@@ -17,27 +17,30 @@ class CurrencyAPI {
       const response = await fetch(`${this.baseUrl}/${this.baseCurrency}.json`);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Failed to fetch: ${response.status}`);
       }
 
       const data = await response.json();
-
-      // API returns { date: "2024-xx-xx", usd: { eur: 0.92, gbp: 0.79, ... } }
       const rates = data[this.baseCurrency];
 
       if (!rates) {
         throw new Error("Invalid API response format");
       }
 
-      // Add USD rate (1.0) for base currency
       const allRates = { usd: 1, ...rates };
-
       currencyStore.setRates(allRates);
       return allRates;
     } catch (error) {
       console.error("Failed to fetch exchange rates:", error);
-      currencyStore.setError(error.message);
-      throw error;
+      const errorMessage = "Could not fetch new rates. Displaying last saved data.";
+      currencyStore.setError(errorMessage);
+
+      // Only throw if there are no rates at all
+      if (Object.keys(currencyStore.rates).length === 0) {
+        throw new Error("API fetch failed and no cached data is available.");
+      }
+      // Return stale rates if available
+      return currencyStore.rates;
     } finally {
       currencyStore.setLoading(false);
     }

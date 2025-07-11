@@ -23,6 +23,7 @@ export class CurrencyCard extends LitElement {
       justify-content: space-between;
       box-shadow: var(--shadow-sm);
       transform: translateY(0);
+      z-index: 1;
     }
 
     .card:hover {
@@ -37,6 +38,11 @@ export class CurrencyCard extends LitElement {
       border-color: var(--color-primary);
       box-shadow: var(--shadow-lg), var(--shadow-glow-primary);
       transform: translateY(-1px);
+      z-index: 2;
+    }
+
+    .card.selector-open {
+      z-index: 3;
     }
 
     .card.calculating {
@@ -231,7 +237,7 @@ export class CurrencyCard extends LitElement {
       box-shadow: var(--shadow-xl);
       max-height: 320px;
       overflow-y: auto;
-      z-index: 1000;
+      z-index: 10;
       margin-top: 0.5rem;
       animation: slideIn 0.2s ease-out;
     }
@@ -413,6 +419,14 @@ export class CurrencyCard extends LitElement {
     // Add global event listeners for dismissing selector
     this._handleGlobalClick = this._handleGlobalClick.bind(this);
     this._handleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
+    this._handleCloseOtherDropdowns =
+      this._handleCloseOtherDropdowns.bind(this);
+
+    // Listen for close-other-dropdowns events
+    document.addEventListener(
+      "close-other-dropdowns",
+      this._handleCloseOtherDropdowns,
+    );
   }
 
   willUpdate(changedProperties) {
@@ -431,6 +445,10 @@ export class CurrencyCard extends LitElement {
 
     // Remove global event listeners
     this._removeGlobalListeners();
+    document.removeEventListener(
+      "close-other-dropdowns",
+      this._handleCloseOtherDropdowns,
+    );
   }
 
   _updateFromStore(store) {
@@ -495,6 +513,10 @@ export class CurrencyCard extends LitElement {
   _handleCurrencyHeaderClick(e) {
     e.stopPropagation();
     const wasOpen = this._showSelector;
+
+    // Close all other dropdowns first
+    this._closeAllOtherDropdowns();
+
     this._showSelector = !this._showSelector;
     this._selectorFilter = "";
     this._highlightedIndex = -1;
@@ -651,6 +673,24 @@ export class CurrencyCard extends LitElement {
     this._removeGlobalListeners();
   }
 
+  _closeAllOtherDropdowns() {
+    // Dispatch a custom event to close all other dropdowns
+    this.dispatchEvent(
+      new CustomEvent("close-other-dropdowns", {
+        detail: { except: this },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+
+  _handleCloseOtherDropdowns(e) {
+    // Close this dropdown if it's not the one that triggered the event
+    if (e.detail.except !== this && this._showSelector) {
+      this._closeSelector();
+    }
+  }
+
   _addGlobalListeners() {
     // Use setTimeout to avoid immediate triggering
     setTimeout(() => {
@@ -779,6 +819,7 @@ export class CurrencyCard extends LitElement {
       this._isActive && "active",
       this._isCalculating && "calculating",
       this._isUpdated && "updated",
+      this._showSelector && "selector-open",
     ]
       .filter(Boolean)
       .join(" ");

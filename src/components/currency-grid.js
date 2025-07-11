@@ -18,7 +18,7 @@ export class CurrencyGrid extends LitElement {
     .currency-card-wrapper {
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: grab;
-      will-change: transform;
+      overflow: visible;
     }
 
     .currency-card-wrapper:active {
@@ -28,7 +28,6 @@ export class CurrencyGrid extends LitElement {
     .currency-card-wrapper.dragging {
       transform: rotate(3deg) scale(1.05);
       box-shadow: var(--shadow-2xl);
-      z-index: 1000;
       backdrop-filter: var(--backdrop-blur);
     }
 
@@ -101,7 +100,7 @@ export class CurrencyGrid extends LitElement {
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       max-height: 320px;
       overflow-y: auto;
-      z-index: 1000;
+      z-index: 9999;
       margin-top: 0.25rem;
     }
 
